@@ -1,0 +1,100 @@
+
+/* Table 3 Style */
+table.table3{
+    font-family:Arial;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1em;
+    text-align:center;
+    border-collapse:collapse;
+    margin-left: 5px;
+}
+.table3 thead th{
+    padding:5px 10px;
+    color:#444;
+    font-weight:bold;
+    border-bottom:1px solid #444;
+}
+.table3 thead :nth-child(1),
+.table3 tfoot :nth-child(1){
+    background-color: #ad7;
+}
+.table3 thead :nth-child(2),
+.table3 tfoot :nth-child(2){
+    background-color: #ad7;
+}
+.table3 tfoot td{
+    font-size:38px;
+    font-weight:bold;
+    padding:15px 0px;
+}
+.table3 tbody td{
+	allign:center;
+    padding:2px;
+}
+.table3 tbody td:nth-child(even){
+    background-color:#444;
+    color:#444;
+    border-bottom:1px solid #444;
+    background:-webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.39, rgb(189,189,189)),
+        color-stop(0.7, rgb(224,224,224))
+        );
+    background:-moz-linear-gradient(
+        center bottom,
+        rgb(189,189,189) 39%,
+        rgb(224,224,224) 70%
+        );
+}
+.table3 tbody td:nth-child(odd){
+    background-color:#555;
+    color:#f0f0f0;
+    border-bottom:1px solid #444;
+    background:-webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.39, rgb(85,85,85)),
+        color-stop(0.7, rgb(105,105,105))
+        );
+    background:-moz-linear-gradient(
+        center bottom,
+        rgb(85,85,85) 39%,
+        rgb(105,105,105) 70%
+        );
+}
+.table3 tbody td:nth-last-child(1){
+    border-right:1px solid #222;
+}
+.table3 tbody th{
+    color:#696969;
+    text-align:center;
+    padding:0px 10px;
+    border-right:1px solid #aaa;
+}
+.table3 tbody span.check::before{
+    content : url(/resources/images/check2.png)
+}
+.button{
+    position:relative;
+    align:center;
+}
+.serverID{
+	min-width:150px;
+}
+.applicarionID{
+	min-width:180px;
+}
+.appID{
+	min-width:100px;
+}
+.center-align{
+  text-align:center;
+}
+.datasourceID{
+	min-width:150px;
+}
