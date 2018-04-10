@@ -6,71 +6,20 @@
 <html>
 <head>
 <title>Oracle Banking Platform</title>
-<spring:url value="/resources/style.css" var="styleCSS" />
-<link href="${styleCSS}" rel="stylesheet" />
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="description" content="Oracle Banking Platform" />
-	<meta name="keywords"
-		content="table, css3, style, beautiful, fancy, css" />
+
+<link href="<c:url value="/resources/css/style.css" />" rel="stylesheet">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="description" content="Oracle Banking Platform" />
+<meta name="keywords"
+	content="table, css3, style, beautiful, fancy, css" />
 </head>
 <style>
-* {
-	margin: 0;
-	padding: 0;
-}
-
-body {
-	font-family: Georgia, serif;
-	font-style: italic;
-	font-weight: normal;
-	letter-spacing: normal;
-	background: #f0f0f0;
-}
-
-#content {
-	background-color: #fff;
-	margin: 0 auto;
-	border-left: 10px solid #1D81B6;
-	border-right: 1px solid #ddd;
-	-moz-box-shadow: 0px 0px 16px #aaa;
-}
-
-.head {
-	font-family: Helvetica, Arial, Verdana;
-	text-transform: uppercase;
-	font-weight: bold;
-	font-size: 12px;
-	font-style: normal;
-	letter-spacing: 3px;
-	color: #888;
-	border-bottom: 3px solid #f0f0f0;
-	padding-bottom: 10px;
-	margin-bottom: 10px;
-}
-
-.head a {
-	color: #1D81B6;
-	text-decoration: none;
-	float: right;
-	text-shadow: 1px 1px 1px #888;
-}
-
-.head a:hover {
-	color: #f0f0f0;
-}
-
 #content h2 {
 	font-family: "Trebuchet MS", sans-serif;
 	text-align: center;
 	font-size: 34px;
 	font-style: normal;
-	background-color: #f0f0f0;
+	background-color: #8cc2e6;
 	margin: 0px 0px 1px -0px;
 	padding: 0px 40px;
 	clear: both;
@@ -81,110 +30,98 @@ body {
 }
 </style>
 <body>
-<%
-response.setIntHeader("Refresh", 300);
-SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yy hh.mm.ss");
-String lastreftime = sdf.format(new Date());
-%>
+	<%
+		response.setIntHeader("Refresh", 300);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yy hh.mm.ss a");
+		String lastreftime = sdf.format(new Date());
+	%>
 	<div id="content">
-		<h2>Oracle Banking Platform</h2>
+		<h2>Oracle Banking Platform - ${environmentName}</h2>
+	</div>
 
-		<div style="text-align: center;">
-			<div style="float: left;">
-				<button class="button">
-					<a href="<c:url value = "/DsStatus.html"/>">DataSorces & HeapSize</a>
-				</button>
-			</div>
-			<div>
-				<p>
-					Last Refresh: <%=lastreftime%></p>
-			</div>
+		<div style="width: 50%; float: left;">
+			<p style="font: bold; color: white;">
+				Last Refresh :
+				<%=lastreftime%></p>
 		</div>
-		<div class="flex-container" align="center">
+		<div style="width: 50%; float: right;">
+			<button>
+				<a href="<c:url value = "/DsStatus.html"/>">DataSorces &
+					HeapSize</a>
+			</button>
+		</div>
 
 
-			<table class="table3">
+	<div style="width: 100%; float: left;">
+		<table>
+			<thead>
+				<tr>
+					<th>Component</th>
+					<th>Server Status</th>
+					<th>Application Status</th>
+				</tr>
 				<thead>
-					<tr>
-						<th class="center-align" scope="col" abbr="Business">Component</th>
-						<th class="center-align" scope="col" abbr="Medium">Weblogic
-							Server Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="envdtls" items="${servermap}">
-						<tr>
-							<td>${envdtls.key}</td>
-							<td align="center">
-								<table width="100%">
-									<thead>
-										<th>Server name</th>
-										<th>State</th>
-										<th>Application Name</th>
-										<th>State</th>
-									</thead>
-									<tr>
-										<c:forEach var="serverlistrow" items="${envdtls.value}">
+					<tbody>
+						<c:forEach var="component" items="${ServerDetailsList}">
+							<tr>
+								<td align="center">${component.servername}</td>
+								<td align="center">
+									<table width="100%">
+										<c:forEach var="domains" items="${component.domainStat}">
 											<tr>
-												<c:forEach var="serverlist" items="${serverlistrow}"
-													varStatus="loop">
-													<c:choose>
-														<c:when test="${loop.index=='0'}">
-															<td class="serverID" align="center">${serverlist}</td>
-														</c:when>
-														<c:when test="${loop.index=='2'}">
-															<td class="applicarionID">${serverlist}</td>
-														</c:when>
-														<c:when test="${loop.index=='1'}">
-															<c:choose>
-																<c:when test="${serverlist.equals('RUNNING')}">
-																	<td class="appID" align="center"
-																		style="color: green; text-transform: initial;">${serverlist}</td>
-																</c:when>
-																<c:when
-																	test="${serverlist.equals('SHUTDOWN') or serverlist.equals('UNABLE_TO_CONNECT')}">
-																	<td class="appID" align="center"
-																		style="color: red; text-transform: initial;">${serverlist}</td>
-																</c:when>
-																<c:otherwise>
-																	<td class="appID" align="center"
-																		style="color: yellow; text-transform: initial;">${serverlist}</td>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:when test="${loop.index=='3'}">
-															<c:choose>
-																<c:when test="${serverlist.equals('STATE_ACTIVE')}">
-																	<td class="appID" align="center"
-																		style="color: green; text-transform: initial;">${serverlist}</td>
-																</c:when>
-																<c:when
-																	test="${serverlist.equals('SHUTDOWN') or serverlist.equals('UNABLE_TO_CONNECT')}">
-																	<td class="appID" align="center"
-																		style="color: red; text-transform: initial;">${serverlist}</td>
-																</c:when>
-																<c:otherwise>
-																	<td class="appID" align="center"
-																		style="color: yellow; text-transform: initial;">${serverlist}</td>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:otherwise>
-															<td class="appID">${serverlist}</td>
-														</c:otherwise>
-													</c:choose>
-												</c:forEach>
+												<td><c:out value="${domains.key}" /></td>
+												<c:choose>
+													<c:when test="${domains.value.equals('RUNNING')}">
+														<td align="right"
+															style="color: green; text-transform: initial;">${domains.value}</td>
+													</c:when>
+													<c:when
+														test="${domains.value.equals('OVERLOADED') or domains.value.equals('FAILED') or domains.value.equals('CRITICAL') or domains.value.equals('SHUTDOWN') or domains.value.equals('UNABLE TO CONNECT')}">
+														<td align="right"
+															style="color: red; text-transform: initial;">${domains.value}</td>
+													</c:when>
+													<c:otherwise>
+														<td align="right"
+															style="color: yellow; text-transform: initial;">${domains.value}</td>
+													</c:otherwise>
+												</c:choose>
 											</tr>
 										</c:forEach>
-									</tr>
-								</table>
-							</td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-		</div>
-		<br></br>
+									</table>
+								</td>
+								<td>
+									<table width="100%">
+										<tbody>
+											<c:forEach var="deployments"
+												items="${component.deploymentStat}" varStatus="loop">
+												<tr>
+													<td><c:out value="${deployments.key}" /></td>
+													<c:choose>
+														<c:when test="${deployments.value.equals('OK')}">
+															<td align="right"
+																style="color: green; text-transform: initial;">${deployments.value}</td>
+														</c:when>
+														<c:when
+															test="${deployments.value.equals('FAILED') or deployments.value.equals('CRITICAL') or deployments.value.equals('OVERLOADED')}">
+															<td align="right"
+																style="color: red; text-transform: initial;">${deployments.value}</td>
+														</c:when>
+														<c:otherwise>
+															<td align="right"
+																style="color: yellow; text-transform: initial;">${deployments.value}</td>
+														</c:otherwise>
+													</c:choose>
+												</tr>
+											</c:forEach>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+		</table>
+	</div>
+	<br></br>
 	</div>
 	<br></br>
 </body>

@@ -2,12 +2,12 @@ package com.obp.healthcheck.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,70 +15,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.obp.healthcheck.helper.AppListHelper;
-import com.obp.healthcheck.helper.DataSorceListHelper;
-import com.obp.healthcheck.helper.GenerateVoHelper;
-import com.obp.healthcheck.helper.HeapTheradHelper;
 import com.obp.healthcheck.helper.ServerListHelper;
-import com.obp.healthcheck.util.AppServerConfigModal;
+import com.obp.healthcheck.modal.Component;
+import com.obp.healthcheck.modal.Components;
+import com.obp.healthcheck.modal.ServerDetails;
 
 @Controller
 public class MainController {
-	GenerateVoHelper voHelper = new GenerateVoHelper();
+	@Autowired
+	private Components components;
 
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	public ModelAndView getServerData() {
-		ServerListHelper serverListHelper = new ServerListHelper();
-		FutureTask<List<String>> slist = new FutureTask<List<String>>(serverListHelper);
-		ExecutorService executor = Executors.newFixedThreadPool(3);
-		executor.submit(slist);
+		System.out.println("Entering controller....");
 		ModelAndView model = new ModelAndView("index");
+		HashMap<String, Component> map = (HashMap<String, Component>) components.getComponentsMap();
+		ExecutorService executorService = Executors.newFixedThreadPool(map.keySet().size());
+		List<Callable<ServerDetails>> callables = new ArrayList<Callable<ServerDetails>>();
+		for (String cId : map.keySet()) {
+			ServerListHelper stask = new ServerListHelper();
+			stask.setComponent(map.get(cId));
+			callables.add(stask);
+		}
+		List<ServerDetails> sListRes = new ArrayList<>();
 		try {
-			System.out.println("Cheinking Script completion");
-			if (slist.isDone() && slist.isDone()) {
-				System.out.println("Done");
-				executor.shutdown();
+			List<Future<ServerDetails>> futures = executorService.invokeAll(callables);
+			for (Future<ServerDetails> future : futures) {
+				sListRes.add(future.get());
+				System.out.println(future.get().toString());
 			}
-			List<String> slistout = slist.get();
-			HashMap<String, ArrayList<ArrayList<String>>> res = voHelper.getConsoleAppServerData(slistout);
-			model.addObject("servermap", res);
 
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Completed...");
+			executorService.shutdown();
 		}
-
-		return model;
-	}
-
-	@RequestMapping(value = "/DsStatus", method = RequestMethod.GET)
-	public ModelAndView getDsStatData() {
-		HeapTheradHelper heapTheradHelper = new HeapTheradHelper();
-		DataSorceListHelper dataSorceListHelper = new DataSorceListHelper();
-		FutureTask<List<String>> dlist = new FutureTask<List<String>>(dataSorceListHelper);
-		FutureTask<List<String>> htlist = new FutureTask<List<String>>(heapTheradHelper);
-		ExecutorService executor = Executors.newFixedThreadPool(2);
-		executor.submit(dlist);
-		executor.submit(htlist);
-		ModelAndView model = new ModelAndView("DsStatus");
-		try {
-			System.out.println("DsStatus Cheinking Script completion");
-			if (dlist.isDone() && htlist.isDone()) {
-				System.out.println("Done");
-				executor.shutdown();
-			}
-			List<String> dlistout = dlist.get();
-			List<String> htlistout = htlist.get();
-			HashMap<String, ArrayList<ArrayList<String>>> dsres = voHelper.getConsoleListData(dlistout);
-			HashMap<String, LinkedHashSet<ArrayList<String>>> htsres = voHelper.getConsoleHTListData(htlistout);
-			model.addObject("DSList", dsres);
-			model.addObject("HTList", htsres);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		} finally {
-			System.out.println("Completed...");
-		}
+		model.addObject("ServerDetailsList", sListRes);
+		model.addObject("environmentName", components.getEnvironmentName());
 		return model;
 	}
 
